@@ -3,7 +3,6 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
-import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
 const validationSchema = yup.object({
@@ -38,25 +37,29 @@ const App = () => {
           alert("Invalid date input");
           return state;
         }
+        let flag = true;
         state.events.map((slot) => {
           if (
             (action.payload.start >= slot.start &&
               action.payload.start < slot.end) ||
             (action.payload.end > slot.start && action.payload.end <= slot.end)
           ) {
-            alert("Conflicts with existing events");
-            return state;
-          } else {
-            const stateEvent = { ...state };
-            stateEvent.events.push({
-              title: action.payload.title,
-              start: action.payload.start,
-              end: action.payload.end,
-            });
-            return stateEvent;
+            flag = false;
           }
         });
-        break;
+        if (flag) {
+          const stateEvent = { ...state };
+          stateEvent.events.push({
+            title: action.payload.title,
+            start: action.payload.start,
+            end: action.payload.end,
+          });
+          return stateEvent;
+        } else {
+          alert("Conflicts with existing events");
+          return state;
+        }
+
       default:
         return state;
     }
